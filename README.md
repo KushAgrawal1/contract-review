@@ -1,10 +1,49 @@
 # Contract Review Assistant
 
-Upload-free demo of AI contract review on real contracts: find the clauses that matter, extract them into structured
-data, and answer questions with the exact source passage. Built and scored on [CUAD](https://github.com/TheAtticusProject/cuad)
-(510 real commercial contracts, 41 clause types, 13,823 spans marked by legal experts, CC BY 4.0).
+**Live demo: https://contract-review-aql7.onrender.com** (free hosting: the first load after a quiet spell can take about
+30 seconds to wake up)
 
-Stack: OpenAI (embeddings + LLM), LangChain, LangGraph, Postgres + pgvector, FastAPI.
+![Reviewing a contract: found clauses on the left, the exact words highlighted in the contract on the right](docs/screenshot.png)
+
+Pick a commercial contract and the app checks it for 40 clause types (governing law, termination, exclusivity, liability
+caps and so on). For each clause it finds, it shows the exact words from the contract, highlighted in place, and marks the
+quote "verified" only if those words really exist in the contract text. There is also a question box that answers from the
+contract and points to its sources.
+
+Built and scored on [CUAD](https://github.com/TheAtticusProject/cuad): 510 real contracts, 13,823 spans marked by legal
+experts (CC BY 4.0). Stack: OpenAI (embeddings + gpt-4o-mini), LangChain, LangGraph, Postgres + pgvector, FastAPI, Docker.
+
+## Results at a glance
+
+Scored against the experts' labels, on 100 contracts that were never used while tuning the prompt:
+
+| What | Result |
+|------|--------|
+| Detecting which clauses are present (precision / recall / F1) | 77.8% / 86.2% / **81.8%** |
+| Same, averaged over clause types (so rare clauses count equally) | 72.0% macro F1 |
+| Quote found in the contract | 98.5% (94.4% word for word) |
+| Cost to review one contract (40 checks) | about $0.01 |
+| Time to review one contract | about 6 seconds (results are then saved) |
+
+Finding the right passage (retrieval, clause_hit@5): 19.9% random, 68.0% with clause-aware chunks, and about 10 points
+higher with query expansion plus hybrid search (table in Phase 2). Precision is a lower bound: CUAD's experts label
+narrowly, so some "false positives" are real clauses nobody marked.
+
+## How it works
+
+```mermaid
+flowchart LR
+    A[Contract text] --> B[Clause-aware chunks]
+    B --> C[(Postgres + pgvector)]
+    D[40 clause types<br/>question + example wording] --> E[Hybrid search<br/>embeddings + keywords, RRF]
+    C --> E
+    E --> F[LLM: present? + verbatim quote]
+    F --> G{Quote found<br/>in contract?}
+    G -->|yes| H[Highlighted in the page<br/>tagged verified]
+    G -->|no| I[Flagged unverified]
+```
+
+Details of each stage, with the numbers that justified it, are in the phases below.
 
 ## Phase 1: ingest, clause-aware chunking, baseline retrieval, scored against expert labels
 
@@ -79,7 +118,10 @@ python -m evals.run_eval --name p2d_rerank  --chunker clause --expand --hybrid -
 | p2a_hybrid | + keyword search (RRF) | | | | |
 | p2b_expand | + example clause wording as the query | | | | |
 | p2c_both | + both | | | | |
-| p2d_rerank | + cross-encoder reranker | | | | |
+
+Run `python -m evals.results_table` to print these rows from your own summary files. A cross-encoder reranker
+(BAAI/bge-reranker-base) was also tried on a 20-contract subset: it scored worse than hybrid + expand and was slow, so it
+was dropped (`--rerank bge` is still available).
 
 - `--expand`: the LLM sees only the clause name and CUAD's one-line description (never a contract or a label) and writes an
   example of typical wording, which is used as the search query.
@@ -170,14 +212,47 @@ inside Docker: `docker compose run --rm api python -m app.ingest --chunker claus
 API (docs at /docs): `GET /contracts`, `GET /contract?doc_name=...` (full text), `POST /review` (all 40 clauses with
 character ranges), `POST /ask` (question answering with citations).
 
+### Put it online
+
+Any host that runs a Dockerfile works. This is the setup with Render (the app) and Neon (Postgres with pgvector); both
+have free tiers, check their current limits.
+
+1. **Database.** Create a Neon project and copy its connection string (it ends in `?sslmode=require`).
+2. **Load it from your computer** (the environment variable overrides `.env` for these commands only):
+   ```bash
+   export DATABASE_URL="postgresql://...neon.tech/neondb?sslmode=require"
+   python -m scripts.init_db
+   python -m app.ingest --chunker clause --limit 120    # 120 contracts is about 100 MB, inside Neon's free storage
+   ```
+3. **App.** On Render create a Web Service from this GitHub repo (it detects the Dockerfile). Add two environment
+   variables: `DATABASE_URL` (the Neon string) and `OPENAI_API_KEY`. Never commit either.
+4. **Spending cap.** Set a monthly limit in the OpenAI dashboard. The question box is limited to 15 questions per visitor
+   per hour and 300 per day (`app/ratelimit.py`); reviews are cached and only ingested contracts can be reviewed.
+
+`app/clauses.json` must be committed, because the deployed app has no CUAD download.
+
+## Limitations and what I would improve next
+
+- **Citation labels in the question box** show the heading where a retrieved chunk begins, not the sentence that supports
+  the answer. Next: check the answer's quoted text against the contract and link to that passage, then measure citation
+  accuracy (Phase 4).
+- **Some quotes point at a cross-reference** instead of the clause itself (for example "terminated under Section 9.2" rather
+  than Section 9.2). About 1 in 7 correct detections overlaps no expert text.
+- **Weak clause types** on held-out contracts: Volume Restriction (F1 30), Uncapped Liability (F1 47), Third Party
+  Beneficiary, and the two Affiliate License types (precision under 35%).
+- **Blank or redacted fields** (for example an agreement date left empty in the source) are quoted faithfully but give no
+  usable value. "Verified" means the words exist in the contract, not that the answer is complete.
+- **Evaluation size:** 100 held-out contracts; several clause types have only a handful of labelled examples.
+- **Demo limits:** 120 contracts are loaded, and the question box allows 15 questions per visitor per hour and 300 per day.
+
 ## Roadmap
 
-| Phase | What | Number to report |
-|-------|------|------------------|
-| 1 | Ingest, two chunkers, dense retrieval, eval vs expert labels | clause_hit@5: random vs fixed vs clause-aware |
-| 2 | Query expansion, hybrid search (dense + keyword), reranker | clause_hit@5 per technique |
-| 3 | LLM extraction into JSON with verbatim quotes, checked against the contract | precision / recall / F1 per clause type, grounded rate, cost per contract |
-| 4 | Answer quality: citation accuracy, "not addressed" handling; cost and time per contract | cost per contract, citation accuracy |
-| 5 | One-page UI, Docker, deploy, short architecture write-up | live demo + blog post |
+| Phase | What | Status |
+|-------|------|--------|
+| 1 | Ingest, two chunkers, dense retrieval, eval vs expert labels | done |
+| 2 | Query expansion, hybrid search (dense + keyword), reranker tested | done |
+| 3 | LLM extraction into JSON with verbatim quotes, checked against the contract | done |
+| 4 | Answer quality: citation accuracy, "not addressed" handling | not started |
+| 5 | One-page UI, Docker, deployed demo | done |
 
 CUAD is licensed CC BY 4.0: credit Hendrycks et al., "CUAD: An Expert-Annotated NLP Dataset for Legal Contract Review" (NeurIPS 2021).
