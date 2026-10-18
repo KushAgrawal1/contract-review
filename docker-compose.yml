@@ -7,10 +7,29 @@ services:
       POSTGRES_PASSWORD: rag
       POSTGRES_DB: rag
     ports:
-      - "5432:5432"
+      - "5432:5432"   # lets the scripts you run on your Mac (python -m app.ingest) reach the database
     volumes:
       - pgdata:/var/lib/postgresql/data
       - ./sql/init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U rag -d rag"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+
+  api:
+    build: .
+    container_name: rag_api
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql://rag:rag@db:5432/rag   # inside Docker the database is called "db", not localhost
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ./data:/app/data   # CUAD files for ingesting; the running app itself reads only the database
 
 volumes:
   pgdata:

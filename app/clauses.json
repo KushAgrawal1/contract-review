@@ -1,0 +1,202 @@
+{
+ "Parties": {
+  "question": "The two or more parties who signed the contract",
+  "answer_format": "Entity or individual names",
+  "example": "This Agreement is made and entered into as of the Effective Date by and between Company, a corporation organized and existing under the laws of the State of [State], with its principal place of business at [Address] (hereinafter referred to as 'Company'), and Distributor, a [type of entity] organized and existing under the laws of the State of [State], with its principal place of business at [Address] (hereinafter referred to as 'Distributor')."
+ },
+ "Agreement Date": {
+  "question": "The date of the contract",
+  "answer_format": "Date (mm/dd/yyyy)",
+  "example": "This Agreement shall be effective as of the date of execution by both parties, which is hereby acknowledged to be the ___ day of __________, 20__ (the \"Effective Date\")."
+ },
+ "Effective Date": {
+  "question": "The date when the contract is effective",
+  "answer_format": "Date (mm/dd/yyyy)",
+  "example": "This Agreement shall become effective as of the date of execution by both parties, which is hereby acknowledged as the Effective Date."
+ },
+ "Expiration Date": {
+  "question": "On what date will the contract's initial term expire?",
+  "answer_format": "Date (mm/dd/yyyy) / Perpetual",
+  "example": "This Agreement shall commence on the Effective Date and shall continue in full force and effect until the expiration of a period of three (3) years from the Effective Date, unless earlier terminated in accordance with the provisions herein. The initial term of this Agreement shall expire on the third anniversary of the Effective Date, unless renewed by mutual written consent of the parties."
+ },
+ "Renewal Term": {
+  "question": "What is the renewal term after the initial term expires? This includes automatic extensions and unilateral extensions with prior notice.",
+  "answer_format": "[Successive] number of years/months / Perpetual",
+  "example": "Upon the expiration of the initial term of this Agreement, the term shall automatically renew for successive one-year periods (each a 'Renewal Term'), unless either party provides written notice of its intent not to renew at least thirty (30) days prior to the expiration of the then-current term. Notwithstanding the foregoing, Company shall have the right to unilaterally extend the Agreement for an additional Renewal Term by providing written notice to Distributor at least sixty (60) days prior to the expiration of the initial term or any subsequent Renewal Term."
+ },
+ "Notice Period To Terminate Renewal": {
+  "question": "What is the notice period required to terminate renewal?",
+  "answer_format": "Number of days/months/year(s)",
+  "example": "Either party may terminate the renewal of this Agreement by providing the other party with written notice of termination at least thirty (30) days prior to the expiration of the then-current term. Such notice shall be delivered in accordance with the notice provisions set forth herein."
+ },
+ "Governing Law": {
+  "question": "Which state/country's law governs the interpretation of the contract?",
+  "answer_format": "Name of a US State / non-US Province, Country",
+  "example": "This Agreement shall be governed by and construed in accordance with the laws of the State of New York, without regard to its conflict of laws principles."
+ },
+ "Most Favored Nation": {
+  "question": "Is there a clause that if a third party gets better terms on the licensing or sale of technology/goods/services described in the contract, the buyer of such technology/goods/services under the contract shall be entitled to those better terms?",
+  "answer_format": "Yes/No",
+  "example": "In the event that Company grants any third party more favorable terms for the licensing or sale of the technology, goods, or services described herein, Distributor shall automatically receive the benefit of such more favorable terms, and Company shall promptly amend this Agreement to reflect such terms."
+ },
+ "Non-Compete": {
+  "question": "Is there a restriction on the ability of a party to compete with the counterparty or operate in a certain geography or business or technology sector?",
+  "answer_format": "Yes/No",
+  "example": "During the term of this Agreement and for a period of two (2) years thereafter, Company agrees not to engage in, directly or indirectly, any business activities that compete with the products or services offered by Distributor within the geographic area of North America. Furthermore, Company shall not solicit or attempt to solicit any customers or clients of Distributor for the purpose of providing competing products or services."
+ },
+ "Exclusivity": {
+  "question": "Is there an exclusive dealing  commitment with the counterparty? This includes a commitment to procure all “requirements” from one party of certain technology, goods, or services or a prohibition on licensing or selling technology, goods or services to third parties, or a prohibition on  collaborating or working with other parties), whether during the contract or  after the contract ends (or both).",
+  "answer_format": "Yes/No",
+  "example": "During the term of this Agreement, Distributor shall purchase exclusively from Company all of its requirements for the Products, and Distributor shall not, without the prior written consent of Company, engage in any agreement or arrangement with any third party for the sale, distribution, or licensing of similar products. Furthermore, for a period of twelve (12) months following the termination of this Agreement, Distributor shall not directly or indirectly collaborate with or supply similar products to any competitor of Company."
+ },
+ "No-Solicit Of Customers": {
+  "question": "Is a party restricted from contracting or soliciting customers or partners of the counterparty, whether during the contract or after the contract ends (or both)?",
+  "answer_format": "Yes/No",
+  "example": "During the term of this Agreement and for a period of twelve (12) months following its termination, Company agrees not to directly or indirectly solicit, engage, or contract with any customers or partners of Distributor with whom Company had contact during the term of this Agreement, without the prior written consent of Distributor."
+ },
+ "Competitive Restriction Exception": {
+  "question": "This category includes the exceptions or carveouts to Non-Compete, Exclusivity and No-Solicit of Customers above.",
+  "answer_format": "Yes/No",
+  "example": "Notwithstanding any provision to the contrary in this Agreement, Company shall not be restricted from engaging in business with any customers or clients that Distributor has solicited or engaged with prior to the Effective Date of this Agreement, nor shall Distributor be restricted from pursuing any business opportunities that do not directly compete with the products or services offered by Company."
+ },
+ "No-Solicit Of Employees": {
+  "question": "Is there a restriction on a party’s soliciting or hiring employees and/or contractors from the  counterparty, whether during the contract or after the contract ends (or both)?",
+  "answer_format": "Yes/No",
+  "example": "During the term of this Agreement and for a period of twelve (12) months following its termination, neither Company nor Distributor shall, directly or indirectly, solicit or hire any employee or contractor of the other party without the prior written consent of the other party."
+ },
+ "Non-Disparagement": {
+  "question": "Is there a requirement on a party not to disparage the counterparty?",
+  "answer_format": "Yes/No",
+  "example": "Neither Company nor Distributor shall, directly or indirectly, make any statements or representations that disparage or defame the other party, its affiliates, or their respective officers, directors, employees, or agents, in any manner that could harm the reputation or goodwill of the other party."
+ },
+ "Termination For Convenience": {
+  "question": "Can a party terminate this  contract without cause (solely by giving a notice and allowing a waiting  period to expire)?",
+  "answer_format": "Yes/No",
+  "example": "Either party may terminate this Agreement for any reason or no reason at all by providing the other party with thirty (30) days' written notice of termination. Upon expiration of the notice period, this Agreement shall terminate without further obligation or liability to either party, except for any obligations that expressly survive termination."
+ },
+ "Rofr/Rofo/Rofn": {
+  "question": "Is there a clause granting one party a right of first refusal, right of first offer or right of first negotiation to purchase, license, market, or distribute equity interest, technology, assets, products or services?",
+  "answer_format": "Yes/No",
+  "example": "In the event that Company intends to sell, license, or otherwise transfer any equity interest, technology, assets, products, or services (the 'Offered Interest'), Company shall first provide Distributor with written notice of such intention, including the terms and conditions of the proposed transaction. Distributor shall have a right of first refusal to purchase the Offered Interest on the terms specified in the notice, which shall be exercised by delivering written notice to Company within thirty (30) days of receipt of such notice."
+ },
+ "Change Of Control": {
+  "question": "Does one party have the right to terminate or is consent or notice required of the counterparty if such party undergoes a change of control, such as a merger, stock sale, transfer of all or substantially all of its assets or business, or assignment by operation of law?",
+  "answer_format": "Yes/No",
+  "example": "In the event of a Change of Control of either party, the affected party shall provide written notice to the other party within thirty (30) days of such Change of Control. The non-affected party shall have the right to terminate this Agreement upon written notice to the affected party within sixty (60) days of receipt of such notice, unless the non-affected party provides its prior written consent to the Change of Control."
+ },
+ "Anti-Assignment": {
+  "question": "Is consent or notice required of a party if the contract is assigned to a third party?",
+  "answer_format": "Yes/No",
+  "example": "Neither party shall assign, transfer, or delegate any of its rights or obligations under this Agreement without the prior written consent of the other party, which consent shall not be unreasonably withheld. Any attempted assignment in violation of this clause shall be null and void."
+ },
+ "Revenue/Profit Sharing": {
+  "question": "Is one party required to share revenue or profit with the counterparty for any technology, goods, or services?",
+  "answer_format": "Yes/No",
+  "example": "Company agrees to pay Distributor a revenue share equal to fifteen percent (15%) of the net sales generated from the sale of the Products, as defined herein, for a period of three (3) years from the Effective Date. Such payments shall be made quarterly, within thirty (30) days following the end of each calendar quarter, accompanied by a detailed statement of sales."
+ },
+ "Price Restrictions": {
+  "question": "Is there a restriction on the  ability of a party to raise or reduce prices of technology, goods, or  services provided?",
+  "answer_format": "Yes/No",
+  "example": "The Distributor agrees that it shall not increase or decrease the prices of the technology, goods, or services provided under this Agreement without the prior written consent of the Company. Any proposed price adjustments must be communicated to the Company at least thirty (30) days in advance and shall not exceed a percentage increase or decrease of more than five percent (5%) per annum."
+ },
+ "Minimum Commitment": {
+  "question": "Is there a minimum order size or minimum amount or units per-time period that one party must buy from the counterparty under the contract?",
+  "answer_format": "Yes/No",
+  "example": "Distributor agrees to purchase a minimum of 1,000 units of Product from Company per calendar quarter during the term of this Agreement. Failure to meet this minimum commitment shall result in a penalty fee of 10% of the total value of the unmet quantity, payable to Company within thirty (30) days of the end of the quarter."
+ },
+ "Volume Restriction": {
+  "question": "Is there a fee increase or consent requirement, etc. if one party’s use of the product/services exceeds certain threshold?",
+  "answer_format": "Yes/No",
+  "example": "In the event that Distributor's purchase of Products exceeds [insert threshold] units within any calendar year, Distributor shall notify Company in writing and shall be subject to a fee increase of [insert percentage] on all units purchased in excess of the threshold, unless Company provides prior written consent to waive such fee increase."
+ },
+ "Ip Ownership Assignment": {
+  "question": "Does intellectual property created  by one party become the property of the counterparty, either per the terms of the contract or upon the occurrence of certain events?",
+  "answer_format": "Yes/No",
+  "example": "All intellectual property rights, including but not limited to patents, copyrights, trademarks, and trade secrets, created or developed by Company in the course of performing its obligations under this Agreement shall be the exclusive property of Distributor. Company hereby assigns and transfers to Distributor all rights, title, and interest in and to such intellectual property, effective upon the creation of such intellectual property."
+ },
+ "Joint Ip Ownership": {
+  "question": "Is there any clause providing for joint or shared ownership of intellectual property between the parties to the contract?",
+  "answer_format": "Yes/No",
+  "example": "The Parties hereby agree that any and all intellectual property developed jointly by Company and Distributor in the course of this Agreement shall be owned jointly by both Parties, with each Party holding an equal undivided interest therein. Each Party shall have the right to use, license, and exploit such jointly owned intellectual property, provided that any such use shall not be detrimental to the other Party's interests."
+ },
+ "License Grant": {
+  "question": "Does the contract contain a license granted by one party to its counterparty?",
+  "answer_format": "Yes/No",
+  "example": "Company hereby grants to Distributor a non-exclusive, non-transferable license to use, reproduce, and distribute the Company’s products solely within the Territory and for the Term of this Agreement, subject to the terms and conditions set forth herein."
+ },
+ "Non-Transferable License": {
+  "question": "Does the contract limit the ability of a party to transfer the license being granted to a third party?",
+  "answer_format": "Yes/No",
+  "example": "Company hereby grants Distributor a non-transferable, non-exclusive license to use the Licensed Materials solely for the purpose of marketing and selling the Products. Distributor shall not assign, sublicense, or otherwise transfer any rights or obligations under this Agreement to any third party without the prior written consent of Company."
+ },
+ "Affiliate License-Licensor": {
+  "question": "Does the contract contain a license grant by affiliates of the licensor or that includes intellectual property of affiliates of the licensor?",
+  "answer_format": "Yes/No",
+  "example": "Subject to the terms and conditions of this Agreement, Licensor hereby grants to Distributor a non-exclusive, non-transferable license to use the intellectual property of Licensor's affiliates, including but not limited to trademarks, trade names, and copyrighted materials, solely in connection with the marketing and distribution of the Licensed Products."
+ },
+ "Affiliate License-Licensee": {
+  "question": "Does the contract contain a license grant to a licensee (incl. sublicensor) and the affiliates of such licensee/sublicensor?",
+  "answer_format": "",
+  "example": "Company hereby grants to Distributor a non-exclusive, non-transferable license to use, reproduce, and distribute the Licensed Materials solely in connection with Distributor's business operations and the operations of its Affiliates, provided that any such use by Affiliates shall be subject to the terms and conditions of this Agreement."
+ },
+ "Unlimited/All-You-Can-Eat-License": {
+  "question": "Is there a clause granting one party an “enterprise,” “all you can eat” or unlimited usage license?",
+  "answer_format": "Yes/No",
+  "example": "Company hereby grants Distributor an unlimited, non-exclusive, and perpetual license to use, reproduce, modify, and distribute the Company’s products and services throughout the Territory, without any restrictions on quantity or frequency of use, provided that Distributor complies with all applicable laws and regulations."
+ },
+ "Irrevocable Or Perpetual License": {
+  "question": "Does the contract contain a  license grant that is irrevocable or perpetual?",
+  "answer_format": "Yes/No",
+  "example": "Company hereby grants to Distributor a non-exclusive, irrevocable, and perpetual license to use, reproduce, and distribute the Company’s products and associated intellectual property in the Territory, subject to the terms and conditions set forth herein."
+ },
+ "Source Code Escrow": {
+  "question": "Is one party required to deposit its source code into escrow with a third party, which can be released to the counterparty upon the occurrence of certain events (bankruptcy,  insolvency, etc.)?",
+  "answer_format": "Yes/No",
+  "example": "Company agrees to deposit the source code for the Software with an independent escrow agent within thirty (30) days of the Effective Date. The source code shall be released to Distributor upon the occurrence of any of the following events: (i) Company becomes insolvent or files for bankruptcy; (ii) Company ceases to conduct business in the ordinary course; or (iii) Company fails to fulfill its obligations under this Agreement after receiving written notice and a thirty (30) day cure period."
+ },
+ "Post-Termination Services": {
+  "question": "Is a party subject to obligations after the termination or expiration of a contract, including any post-termination transition, payment, transfer of IP, wind-down, last-buy, or similar commitments?",
+  "answer_format": "Yes/No",
+  "example": "Upon termination or expiration of this Agreement, Company shall provide Distributor with reasonable post-termination services for a period of thirty (30) days to facilitate an orderly transition of services. During this period, Distributor shall compensate Company for any services rendered at the rates specified herein, and both parties shall cooperate to ensure the transfer of any intellectual property and other relevant materials as necessary."
+ },
+ "Audit Rights": {
+  "question": "Does a party have the right to  audit the books, records, or physical locations of the counterparty to ensure compliance with the contract?",
+  "answer_format": "Yes/No",
+  "example": "Company shall have the right, upon reasonable prior written notice, to audit the books, records, and physical locations of Distributor during normal business hours to verify compliance with the terms of this Agreement. Such audit shall be conducted at Company’s expense, and Distributor agrees to cooperate fully with Company in connection with any such audit."
+ },
+ "Uncapped Liability": {
+  "question": "Is a party’s liability uncapped upon the breach of its obligation in the contract? This also includes uncap liability for a particular type of breach such as IP infringement or breach of confidentiality obligation.",
+  "answer_format": "Yes/No",
+  "example": "Notwithstanding any other provision of this Agreement, Company shall be liable for any and all damages, losses, or expenses arising from its breach of this Agreement, including but not limited to breaches of confidentiality obligations and intellectual property infringement, without any limitation or cap on the amount of such liability."
+ },
+ "Cap On Liability": {
+  "question": "Does the contract include a cap on liability upon the breach of a party’s obligation? This includes time limitation for the counterparty to bring claims or maximum amount for recovery.",
+  "answer_format": "Yes/No",
+  "example": "Notwithstanding any other provision of this Agreement, the total liability of Company to Distributor for any claims arising out of or related to this Agreement shall not exceed the total fees paid by Distributor to Company under this Agreement during the twelve (12) months preceding the event giving rise to the claim. Furthermore, any claims must be brought within twelve (12) months from the date the cause of action arose."
+ },
+ "Liquidated Damages": {
+  "question": "Does the contract contain a clause that would award either party liquidated damages for breach or a fee upon the termination of a contract (termination fee)?",
+  "answer_format": "Yes/No",
+  "example": "In the event of a breach of this Agreement by either party, the breaching party shall pay to the non-breaching party liquidated damages in the amount of $50,000, which the parties agree represents a reasonable estimate of the damages that would be incurred as a result of such breach. Furthermore, should this Agreement be terminated by either party prior to the expiration of the Term, the terminating party shall pay a termination fee of $25,000 to the other party."
+ },
+ "Warranty Duration": {
+  "question": "What is the duration of any  warranty against defects or errors in technology, products, or services  provided under the contract?",
+  "answer_format": "Number of months or years",
+  "example": "The Company warrants that all technology, products, and services provided under this Agreement shall be free from defects in materials and workmanship for a period of twelve (12) months from the date of delivery to the Distributor. In the event of any defect or error reported within the warranty period, the Company shall, at its sole discretion, either repair or replace the defective technology, products, or services at no additional cost to the Distributor."
+ },
+ "Insurance": {
+  "question": "Is there a requirement for insurance that must be maintained by one party for the benefit of the counterparty?",
+  "answer_format": "Yes/No",
+  "example": "Company shall maintain, at its own expense, comprehensive general liability insurance with a minimum coverage of $1,000,000 per occurrence and $2,000,000 in the aggregate, naming Distributor as an additional insured. Such insurance shall cover any claims arising out of or related to the performance of this Agreement and shall remain in effect for the duration of the Agreement."
+ },
+ "Covenant Not To Sue": {
+  "question": "Is a party restricted from contesting the validity of the counterparty’s ownership of intellectual property or otherwise bringing a claim against the counterparty for matters unrelated to the contract?",
+  "answer_format": "Yes/No",
+  "example": "Company hereby covenants not to sue Distributor, and agrees not to contest the validity of any intellectual property rights owned by Distributor, nor to bring any claims against Distributor arising out of or related to matters not expressly covered by this Agreement."
+ },
+ "Third Party Beneficiary": {
+  "question": "Is there a non-contracting party who is a beneficiary to some or all of the clauses in the contract and therefore can enforce its rights against a contracting party?",
+  "answer_format": "Yes/No",
+  "example": "This Agreement is intended for the sole benefit of Company and Distributor, and nothing in this Agreement shall be construed to confer any rights or benefits upon any third party, except that the parties acknowledge and agree that [insert name of third party] shall be a third-party beneficiary entitled to enforce the provisions of this Agreement as they relate to [specific rights or obligations]."
+ }
+}

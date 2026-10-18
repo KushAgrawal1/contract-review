@@ -149,6 +149,27 @@ Known limits:
   and the two Affiliate License types (precision under 35%).
 - 100 contracts and 4,000 checks. Several clause types have only a handful of labelled examples.
 
+## Phase 5: one-page app, Docker
+
+Pick a contract, press Review, and all 40 clause types are checked. Found clauses are listed with a "verified" tag when the
+quote exists in the contract word for word, and clicking one highlights those exact words in the contract text. There is
+also a question box that answers from the contract and links each citation to its passage.
+
+```bash
+python -m scripts.export_clauses        # once: writes app/clauses.json (commit it, the deployed app needs it)
+docker compose up --build               # database + app
+```
+
+Open http://localhost:8000. The first review of a contract takes about 10 seconds and about one cent; the result is saved
+in Postgres (table `reviews`), so opening it again is instant and free. Only contracts you have ingested can be reviewed,
+so a public demo cannot be made to spend more than ingesting-everything-once would (about $5 for all 510).
+
+Ingest from your Mac as before (`python -m app.ingest --chunker clause --limit 120`, with the database running), or
+inside Docker: `docker compose run --rm api python -m app.ingest --chunker clause --limit 120`.
+
+API (docs at /docs): `GET /contracts`, `GET /contract?doc_name=...` (full text), `POST /review` (all 40 clauses with
+character ranges), `POST /ask` (question answering with citations).
+
 ## Roadmap
 
 | Phase | What | Number to report |

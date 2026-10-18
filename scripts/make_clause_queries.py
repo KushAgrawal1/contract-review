@@ -1,6 +1,6 @@
 """Query expansion for clause search: ask the LLM for a realistic example of how each clause type is worded.
 
-  python scripts/make_clause_queries.py        # 41 cheap LLM calls -> data/cuad/clause_examples.json
+  python -m scripts.make_clause_queries        # 41 cheap LLM calls -> data/cuad/clause_examples.json
 
 Contracts say "Neither party shall assign this Agreement without prior written consent", not "Anti-Assignment:
 does a party need consent to assign?". Searching with an example of the real wording matches the real text better.

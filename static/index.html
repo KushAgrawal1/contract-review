@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Contract Review Assistant</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 16 16%27%3E%3Crect width=%2716%27 height=%2716%27 rx=%273%27 fill=%27%231f5f4a%27/%3E%3Cpath d=%27M4 5h8M4 8h8M4 11h5%27 stroke=%27white%27 stroke-width=%271.5%27/%3E%3C/svg%3E">
+<style>
+  :root {
+    --bg: #f6f5f1; --panel: #ffffff; --ink: #1d1d1b; --muted: #6b6a64; --line: #e3e1d9;
+    --accent: #1f5f4a; --accent-soft: #e2efe9; --hit: #ffe27a; --warn: #9a5b00; --warn-soft: #fbefd5;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #151614; --panel: #1e201d; --ink: #ecebe5; --muted: #9a9a92; --line: #31342f;
+      --accent: #6cc2a1; --accent-soft: #1f3a30; --hit: #7a6511; --warn: #e8b35a; --warn-soft: #3a2f16;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  header { padding: 14px 16px; border-bottom: 1px solid var(--line); background: var(--panel); display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+  h1 { font-size: 17px; margin: 0 8px 0 0; font-weight: 650; letter-spacing: -0.01em; }
+  select, input[type=text], button { font: inherit; color: inherit; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 7px 10px; }
+  select { flex: 1 1 260px; min-width: 0; max-width: 520px; }
+  button { cursor: pointer; }
+  button.primary { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 600; }
+  @media (prefers-color-scheme: dark) { button.primary { color: #0d1f18; } }
+  button:disabled { opacity: .55; cursor: default; }
+  #stats { color: var(--muted); font-size: 13px; }
+  main { display: grid; grid-template-columns: minmax(300px, 400px) 1fr; gap: 12px; padding: 12px 16px 16px; height: calc(100vh - 66px); }
+  @media (max-width: 800px) { main { grid-template-columns: 1fr; height: auto; } #list, #text { max-height: 60vh; } }
+  .pane { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; overflow: auto; min-height: 0; }
+  .bar { position: sticky; top: 0; background: var(--panel); border-bottom: 1px solid var(--line); padding: 8px 10px; display: flex; gap: 8px; align-items: center; font-size: 13px; z-index: 1; }
+  .chip { padding: 3px 10px; border-radius: 99px; border: 1px solid var(--line); background: transparent; font-size: 13px; }
+  .chip.on { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); font-weight: 600; }
+  .item { padding: 9px 12px; border-bottom: 1px solid var(--line); cursor: pointer; }
+  .item:hover { background: var(--bg); }
+  .item.sel { background: var(--accent-soft); }
+  .item .name { display: flex; justify-content: space-between; gap: 8px; font-weight: 600; font-size: 14px; }
+  .item .quote { color: var(--muted); font-size: 13px; margin-top: 2px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .item.absent .name { color: var(--muted); font-weight: 500; }
+  .tag { font-size: 11px; padding: 1px 7px; border-radius: 99px; white-space: nowrap; align-self: center; }
+  .tag.ok { background: var(--accent-soft); color: var(--accent); }
+  .tag.approx { background: var(--warn-soft); color: var(--warn); }
+  .tag.none { color: var(--muted); border: 1px solid var(--line); }
+  #text { padding: 16px 20px; white-space: pre-wrap; overflow-wrap: anywhere; font: 13.5px/1.6 ui-serif, Georgia, serif; }
+  mark { background: var(--hit); color: inherit; padding: 1px 0; border-radius: 2px; }
+  .empty { color: var(--muted); padding: 24px; text-align: center; }
+  #ask { display: flex; gap: 8px; padding: 8px 10px; border-bottom: 1px solid var(--line); }
+  #ask input { flex: 1; min-width: 0; }
+  #answer { padding: 10px 12px; border-bottom: 1px solid var(--line); font-size: 14px; display: none; }
+  #answer .cites { margin-top: 6px; display: flex; flex-wrap: wrap; gap: 6px; }
+  #answer .cites button { padding: 2px 8px; font-size: 12px; }
+  .spin { display: inline-block; width: 12px; height: 12px; border: 2px solid var(--line); border-top-color: var(--accent); border-radius: 50%; animation: s .7s linear infinite; vertical-align: -2px; margin-right: 6px; }
+  @keyframes s { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+<header>
+  <h1>Contract Review Assistant</h1>
+  <select id="contract" aria-label="Contract"></select>
+  <button id="go" class="primary">Review</button>
+  <span id="stats"></span>
+</header>
+<main>
+  <section class="pane" id="list">
+    <div id="ask">
+      <input type="text" id="q" placeholder="Ask this contract a question" aria-label="Question">
+      <button id="askbtn">Ask</button>
+    </div>
+    <div id="answer"></div>
+    <div class="bar">
+      <button class="chip on" data-f="found">Found</button>
+      <button class="chip" data-f="all">All 40</button>
+    </div>
+    <div id="items"><div class="empty">Pick a contract and press Review.</div></div>
+  </section>
+  <section class="pane" id="text"><div class="empty">The contract text appears here. Click a clause to see the exact words that were found.</div></section>
+</main>
+<script>
+const $ = (id) => document.getElementById(id);
+let state = { text: "", clauses: [], filter: "found", selected: null };
+
+async function api(path, opts) {
+  const r = await fetch(path, opts);
+  if (!r.ok) throw new Error((await r.json().catch(() => ({}))).detail || r.statusText);
+  return r.json();
+}
+const post = (path, body) => api(path, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+
+async function init() {
+  const names = await api("/contracts");
+  $("contract").replaceChildren(...names.map((n) => Object.assign(document.createElement("option"), { value: n, textContent: n })));
+  if (!names.length) $("stats").textContent = "No contracts yet. Run: python -m app.ingest --chunker clause";
+}
+
+function showText(range) {
+  const box = $("text"), t = state.text;
+  if (!range) { box.textContent = t; return; }
+  const [s, e] = range;
+  const mark = document.createElement("mark");
+  mark.textContent = t.slice(s, e);
+  box.replaceChildren(t.slice(0, s), mark, t.slice(e));
+  mark.scrollIntoView({ block: "center" });
+}
+
+function renderList() {
+  const items = $("items");
+  const rows = state.clauses.filter((c) => state.filter === "all" || c.present);
+  if (!rows.length) { items.innerHTML = '<div class="empty">Nothing found.</div>'; return; }
+  rows.sort((a, b) => (b.present - a.present) || ((a.start ?? 1e12) - (b.start ?? 1e12)) || a.category.localeCompare(b.category));
+  items.replaceChildren(...rows.map((c) => {
+    const el = document.createElement("div");
+    el.className = "item" + (c.present ? "" : " absent") + (state.selected === c.category ? " sel" : "");
+    const name = document.createElement("div"); name.className = "name";
+    const label = document.createElement("span"); label.textContent = c.category;
+    const tag = document.createElement("span");
+    if (!c.present) { tag.className = "tag none"; tag.textContent = "not found"; }
+    else if (c.grounded && c.match === "exact") { tag.className = "tag ok"; tag.textContent = "verified"; }
+    else if (c.grounded) { tag.className = "tag approx"; tag.textContent = "close match"; }
+    else { tag.className = "tag approx"; tag.textContent = "unverified"; }
+    name.append(label, tag); el.append(name);
+    if (c.quote) { const q = document.createElement("div"); q.className = "quote"; q.textContent = c.quote; el.append(q); }
+    el.onclick = () => { state.selected = c.category; renderList(); if (c.start != null) showText([c.start, c.end]); };
+    return el;
+  }));
+}
+
+document.querySelectorAll(".chip").forEach((b) => (b.onclick = () => {
+  state.filter = b.dataset.f;
+  document.querySelectorAll(".chip").forEach((x) => x.classList.toggle("on", x === b));
+  renderList();
+}));
+
+$("go").onclick = async () => {
+  const name = $("contract").value;
+  if (!name) return;
+  $("go").disabled = true; $("answer").style.display = "none";
+  $("stats").innerHTML = '<span class="spin"></span>Reviewing 40 clause types (about 10 seconds the first time)';
+  $("items").innerHTML = "";
+  try {
+    const [doc, rev] = await Promise.all([api("/contract?doc_name=" + encodeURIComponent(name)), post("/review", { doc_name: name })]);
+    state = { ...state, text: doc.text, clauses: rev.clauses, selected: null };
+    showText(null); renderList();
+    $("stats").textContent = `${rev.found} of ${rev.total} clause types found` + (rev.cached ? " (saved result)" : ` in ${rev.seconds}s, $${rev.cost_usd}`);
+  } catch (err) {
+    $("stats").textContent = "Error: " + err.message;
+  } finally { $("go").disabled = false; }
+};
+
+async function ask() {
+  const question = $("q").value.trim(), name = $("contract").value;
+  if (!question || !name) return;
+  const box = $("answer");
+  box.style.display = "block"; box.innerHTML = '<span class="spin"></span>Thinking';
+  $("askbtn").disabled = true;
+  try {
+    if (!state.text) state.text = (await api("/contract?doc_name=" + encodeURIComponent(name))).text;
+    const res = await post("/ask", { doc_name: name, question });
+    const p = document.createElement("div"); p.textContent = res.answer;
+    const cites = document.createElement("div"); cites.className = "cites";
+    res.citations.forEach((c) => {
+      const b = document.createElement("button");
+      b.textContent = `[${c.n}] ${c.heading || "passage"}`;
+      b.onclick = () => showText([c.char_start, c.char_end]);
+      cites.append(b);
+    });
+    box.replaceChildren(p, cites);
+  } catch (err) { box.textContent = "Error: " + err.message; }
+  finally { $("askbtn").disabled = false; }
+}
+$("askbtn").onclick = ask;
+$("q").addEventListener("keydown", (e) => { if (e.key === "Enter") ask(); });
+$("contract").addEventListener("change", () => { state = { text: "", clauses: [], filter: state.filter, selected: null }; $("items").innerHTML = '<div class="empty">Press Review.</div>'; $("text").innerHTML = ""; $("stats").textContent = ""; });
+init().catch((e) => ($("stats").textContent = "Error: " + e.message));
+</script>
+</body>
+</html>

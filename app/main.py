@@ -1,9 +1,13 @@
+from pathlib import Path
+
 from fastapi import FastAPI, HTTPException
+from fastapi.responses import FileResponse
 from pydantic import BaseModel
 
 from app.config import settings
 from app.db import get_conn
 from app.graph import build_graph
+from app.review import review_contract
 
 app = FastAPI(title="Contract Review Assistant")
 
@@ -25,6 +29,36 @@ class Citation(BaseModel):
 class AskResponse(BaseModel):
     answer: str
     citations: list[Citation]
+
+
+class ReviewRequest(BaseModel):
+    doc_name: str
+
+
+@app.get("/", include_in_schema=False)
+def index() -> FileResponse:
+    return FileResponse(Path(__file__).parent / "static" / "index.html")
+
+
+@app.get("/contract")
+def contract(doc_name: str) -> dict:
+    """The full contract text. The character ranges returned by /review are offsets into this text."""
+    with get_conn() as conn:
+        row = conn.execute("SELECT text FROM contracts WHERE doc_name = %s", (doc_name,)).fetchone()
+    if not row:
+        raise HTTPException(404, "Unknown contract. See GET /contracts")
+    return {"doc_name": doc_name, "text": row[0]}
+
+
+@app.post("/review")
+def review(req: ReviewRequest) -> dict:
+    """All 40 clause checks for one contract. About 10 seconds and one cent the first time, instant after."""
+    if not settings.openai_api_key:
+        raise HTTPException(500, "OPENAI_API_KEY is not set (see .env.example)")
+    try:
+        return review_contract(req.doc_name)
+    except KeyError:
+        raise HTTPException(404, "Unknown contract. See GET /contracts")
 
 
 @app.get("/health")
