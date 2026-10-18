@@ -1,0 +1,2 @@
+# Only needed for --rerank bge (local cross-encoder, free per query). CPU is fine.
+sentence-transformers>=3.0

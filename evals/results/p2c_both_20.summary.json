@@ -1,0 +1,164 @@
+{
+  "pairs_scored": 236,
+  "clause_hit_pct": 75.0,
+  "span_recall_pct": 68.2,
+  "mrr": 0.594,
+  "macro_clause_hit_pct": 79.1,
+  "by_category": {
+    "Affiliate License-Licensee": {
+      "n": 1,
+      "clause_hit_pct": 100.0
+    },
+    "Agreement Date": {
+      "n": 19,
+      "clause_hit_pct": 26.3
+    },
+    "Anti-Assignment": {
+      "n": 13,
+      "clause_hit_pct": 100.0
+    },
+    "Audit Rights": {
+      "n": 9,
+      "clause_hit_pct": 88.9
+    },
+    "Cap On Liability": {
+      "n": 9,
+      "clause_hit_pct": 88.9
+    },
+    "Change Of Control": {
+      "n": 1,
+      "clause_hit_pct": 100.0
+    },
+    "Competitive Restriction Exception": {
+      "n": 3,
+      "clause_hit_pct": 66.7
+    },
+    "Covenant Not To Sue": {
+      "n": 4,
+      "clause_hit_pct": 25.0
+    },
+    "Effective Date": {
+      "n": 17,
+      "clause_hit_pct": 35.3
+    },
+    "Exclusivity": {
+      "n": 9,
+      "clause_hit_pct": 66.7
+    },
+    "Expiration Date": {
+      "n": 15,
+      "clause_hit_pct": 86.7
+    },
+    "Governing Law": {
+      "n": 18,
+      "clause_hit_pct": 100.0
+    },
+    "Insurance": {
+      "n": 7,
+      "clause_hit_pct": 57.1
+    },
+    "Ip Ownership Assignment": {
+      "n": 3,
+      "clause_hit_pct": 100.0
+    },
+    "Irrevocable Or Perpetual License": {
+      "n": 1,
+      "clause_hit_pct": 100.0
+    },
+    "Joint Ip Ownership": {
+      "n": 2,
+      "clause_hit_pct": 100.0
+    },
+    "License Grant": {
+      "n": 10,
+      "clause_hit_pct": 100.0
+    },
+    "Liquidated Damages": {
+      "n": 3,
+      "clause_hit_pct": 66.7
+    },
+    "Minimum Commitment": {
+      "n": 8,
+      "clause_hit_pct": 62.5
+    },
+    "Most Favored Nation": {
+      "n": 1,
+      "clause_hit_pct": 0.0
+    },
+    "No-Solicit Of Customers": {
+      "n": 2,
+      "clause_hit_pct": 100.0
+    },
+    "No-Solicit Of Employees": {
+      "n": 3,
+      "clause_hit_pct": 100.0
+    },
+    "Non-Compete": {
+      "n": 6,
+      "clause_hit_pct": 83.3
+    },
+    "Non-Disparagement": {
+      "n": 1,
+      "clause_hit_pct": 100.0
+    },
+    "Non-Transferable License": {
+      "n": 6,
+      "clause_hit_pct": 83.3
+    },
+    "Notice Period To Terminate Renewal": {
+      "n": 3,
+      "clause_hit_pct": 100.0
+    },
+    "Parties": {
+      "n": 20,
+      "clause_hit_pct": 65.0
+    },
+    "Post-Termination Services": {
+      "n": 10,
+      "clause_hit_pct": 90.0
+    },
+    "Renewal Term": {
+      "n": 4,
+      "clause_hit_pct": 100.0
+    },
+    "Revenue/Profit Sharing": {
+      "n": 8,
+      "clause_hit_pct": 75.0
+    },
+    "Rofr/Rofo/Rofn": {
+      "n": 3,
+      "clause_hit_pct": 100.0
+    },
+    "Termination For Convenience": {
+      "n": 7,
+      "clause_hit_pct": 100.0
+    },
+    "Uncapped Liability": {
+      "n": 4,
+      "clause_hit_pct": 100.0
+    },
+    "Volume Restriction": {
+      "n": 3,
+      "clause_hit_pct": 0.0
+    },
+    "Warranty Duration": {
+      "n": 3,
+      "clause_hit_pct": 100.0
+    }
+  },
+  "config": {
+    "run_name": "p2c_both_20",
+    "chunker": "clause",
+    "k": 5,
+    "random_baseline": false,
+    "expand": true,
+    "hybrid": true,
+    "rerank": "none",
+    "candidates": 20,
+    "embedding_model": "text-embedding-3-small",
+    "contracts": 20,
+    "chunks_in_db_for_chunker": 27898,
+    "seconds": 9.4,
+    "timestamp_utc": "2026-10-18T10:44:23+00:00"
+  }
+}

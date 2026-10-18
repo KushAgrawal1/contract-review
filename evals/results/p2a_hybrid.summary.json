@@ -1,0 +1,184 @@
+{
+  "pairs_scored": 6192,
+  "clause_hit_pct": 71.7,
+  "span_recall_pct": 57.9,
+  "mrr": 0.556,
+  "macro_clause_hit_pct": 75.6,
+  "by_category": {
+    "Affiliate License-Licensee": {
+      "n": 59,
+      "clause_hit_pct": 79.7
+    },
+    "Affiliate License-Licensor": {
+      "n": 23,
+      "clause_hit_pct": 78.3
+    },
+    "Agreement Date": {
+      "n": 470,
+      "clause_hit_pct": 35.5
+    },
+    "Anti-Assignment": {
+      "n": 374,
+      "clause_hit_pct": 97.9
+    },
+    "Audit Rights": {
+      "n": 214,
+      "clause_hit_pct": 90.2
+    },
+    "Cap On Liability": {
+      "n": 275,
+      "clause_hit_pct": 89.5
+    },
+    "Change Of Control": {
+      "n": 121,
+      "clause_hit_pct": 92.6
+    },
+    "Competitive Restriction Exception": {
+      "n": 76,
+      "clause_hit_pct": 65.8
+    },
+    "Covenant Not To Sue": {
+      "n": 100,
+      "clause_hit_pct": 62.0
+    },
+    "Effective Date": {
+      "n": 390,
+      "clause_hit_pct": 36.9
+    },
+    "Exclusivity": {
+      "n": 180,
+      "clause_hit_pct": 61.1
+    },
+    "Expiration Date": {
+      "n": 413,
+      "clause_hit_pct": 80.9
+    },
+    "Governing Law": {
+      "n": 437,
+      "clause_hit_pct": 98.4
+    },
+    "Insurance": {
+      "n": 166,
+      "clause_hit_pct": 95.8
+    },
+    "Ip Ownership Assignment": {
+      "n": 124,
+      "clause_hit_pct": 73.4
+    },
+    "Irrevocable Or Perpetual License": {
+      "n": 70,
+      "clause_hit_pct": 87.1
+    },
+    "Joint Ip Ownership": {
+      "n": 46,
+      "clause_hit_pct": 89.1
+    },
+    "License Grant": {
+      "n": 255,
+      "clause_hit_pct": 86.7
+    },
+    "Liquidated Damages": {
+      "n": 61,
+      "clause_hit_pct": 68.9
+    },
+    "Minimum Commitment": {
+      "n": 165,
+      "clause_hit_pct": 75.2
+    },
+    "Most Favored Nation": {
+      "n": 28,
+      "clause_hit_pct": 39.3
+    },
+    "No-Solicit Of Customers": {
+      "n": 34,
+      "clause_hit_pct": 88.2
+    },
+    "No-Solicit Of Employees": {
+      "n": 59,
+      "clause_hit_pct": 93.2
+    },
+    "Non-Compete": {
+      "n": 119,
+      "clause_hit_pct": 68.1
+    },
+    "Non-Disparagement": {
+      "n": 38,
+      "clause_hit_pct": 65.8
+    },
+    "Non-Transferable License": {
+      "n": 138,
+      "clause_hit_pct": 84.1
+    },
+    "Notice Period To Terminate Renewal": {
+      "n": 111,
+      "clause_hit_pct": 98.2
+    },
+    "Parties": {
+      "n": 509,
+      "clause_hit_pct": 24.6
+    },
+    "Post-Termination Services": {
+      "n": 182,
+      "clause_hit_pct": 73.1
+    },
+    "Price Restrictions": {
+      "n": 15,
+      "clause_hit_pct": 66.7
+    },
+    "Renewal Term": {
+      "n": 176,
+      "clause_hit_pct": 97.7
+    },
+    "Revenue/Profit Sharing": {
+      "n": 166,
+      "clause_hit_pct": 68.7
+    },
+    "Rofr/Rofo/Rofn": {
+      "n": 85,
+      "clause_hit_pct": 72.9
+    },
+    "Source Code Escrow": {
+      "n": 13,
+      "clause_hit_pct": 100.0
+    },
+    "Termination For Convenience": {
+      "n": 183,
+      "clause_hit_pct": 74.3
+    },
+    "Third Party Beneficiary": {
+      "n": 32,
+      "clause_hit_pct": 78.1
+    },
+    "Uncapped Liability": {
+      "n": 111,
+      "clause_hit_pct": 96.4
+    },
+    "Unlimited/All-You-Can-Eat-License": {
+      "n": 17,
+      "clause_hit_pct": 76.5
+    },
+    "Volume Restriction": {
+      "n": 82,
+      "clause_hit_pct": 35.4
+    },
+    "Warranty Duration": {
+      "n": 75,
+      "clause_hit_pct": 76.0
+    }
+  },
+  "config": {
+    "run_name": "p2a_hybrid",
+    "chunker": "clause",
+    "k": 5,
+    "random_baseline": false,
+    "expand": false,
+    "hybrid": true,
+    "rerank": "none",
+    "candidates": 20,
+    "embedding_model": "text-embedding-3-small",
+    "contracts": 510,
+    "chunks_in_db_for_chunker": 27898,
+    "seconds": 37.3,
+    "timestamp_utc": "2026-10-18T09:42:27+00:00"
+  }
+}

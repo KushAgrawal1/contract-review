@@ -1,0 +1,11 @@
+.env
+.venv/
+__pycache__/
+*.pyc
+
+# CUAD is fetched by scripts/prepare_cuad.py (CC BY 4.0), not committed
+data/cuad/
+data/cuad_repo/
+
+# keep eval summaries (the headline numbers), drop per-question dumps
+evals/results/*.jsonl
