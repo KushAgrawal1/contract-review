@@ -9,3 +9,6 @@ data/cuad_repo/
 
 # keep eval summaries (the headline numbers), drop per-question dumps
 evals/results/*.jsonl
+
+# macOS
+.DS_Store
