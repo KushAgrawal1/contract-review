@@ -1,5 +1,7 @@
 # Contract Review Assistant
 
+[![tests](https://github.com/KushAgrawal1/contract-review/actions/workflows/tests.yml/badge.svg)](https://github.com/KushAgrawal1/contract-review/actions/workflows/tests.yml)
+
 **Live demo: https://contract-review-aql7.onrender.com** (free hosting: the first load after a quiet spell can take about
 30 seconds to wake up)
 
