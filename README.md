@@ -231,6 +231,18 @@ have free tiers, check their current limits.
 
 `app/clauses.json` must be committed, because the deployed app has no CUAD download.
 
+## Tests
+
+Unit tests cover the logic that decides whether an answer can be trusted: Reciprocal Rank Fusion, the verbatim and fuzzy
+quote checks, parsing of the model's JSON, both chunkers, and the clause list. They need no database and no API key.
+
+```bash
+pip install -r requirements.txt -r requirements-dev.txt
+python -m pytest -q
+```
+
+GitHub Actions runs them on every push and pull request.
+
 ## Limitations and what I would improve next
 
 - **Citation labels in the question box** show the heading where a retrieved chunk begins, not the sentence that supports
