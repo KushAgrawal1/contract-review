@@ -270,3 +270,6 @@ GitHub Actions runs them on every push and pull request.
 | 5 | One-page UI, Docker, deployed demo | done |
 
 CUAD is licensed CC BY 4.0: credit Hendrycks et al., "CUAD: An Expert-Annotated NLP Dataset for Legal Contract Review" (NeurIPS 2021).
+## License
+
+The code is released under the MIT License (see `LICENSE`). The CUAD dataset is licensed separately under CC BY 4.0 (see `docs/DATA.md`).
