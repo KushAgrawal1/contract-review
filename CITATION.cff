@@ -1,0 +1,9 @@
+cff-version: 1.2.0
+message: "If you use this project, please cite it as below."
+title: "Contract Review Assistant"
+type: software
+authors:
+  - family-names: "Agrawal"
+    given-names: "Kush"
+repository-code: "https://github.com/KushAgrawal1/contract-review"
+license: MIT
