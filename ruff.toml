@@ -1,6 +1,13 @@
-line-length = 100
+line-length = 120
 target-version = "py311"
 
 [lint]
 select = ["E", "F", "I", "B", "UP"]
-ignore = ["B008"]
+ignore = [
+  "B008",   # FastAPI Depends() in defaults
+  "E501",   # long lines are normal in docstrings and prompts here
+  "E741",   # short names like `l` in comprehensions
+  "E731",   # small lambdas
+  "B905",   # zip() without strict=
+  "UP031",  # percent format in the SQL string in retrieval.py
+]
