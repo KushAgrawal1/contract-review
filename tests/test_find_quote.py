@@ -1,4 +1,5 @@
 """find_quote is the hallucination check: a quote the model gives must be found in the contract text."""
+
 from app.extract import find_quote
 
 CONTRACT = (
@@ -14,15 +15,24 @@ def text_of(quote: str) -> str:
 
 
 def test_exact_quote_is_found_at_the_right_place():
-    assert text_of("Either party may terminate on 30 days notice") == "Either party may terminate on 30 days notice"
+    assert (
+        text_of("Either party may terminate on 30 days notice")
+        == "Either party may terminate on 30 days notice"
+    )
 
 
 def test_whitespace_and_case_are_ignored():
-    assert text_of("governed by the laws of the unauthorized state") == "governed by the laws of THEUNAUTHORIZED State"
+    assert (
+        text_of("governed by the laws of the unauthorized state")
+        == "governed by the laws of THEUNAUTHORIZED State"
+    )
 
 
 def test_trailing_full_stop_added_by_the_model_is_ignored():
-    assert text_of("Either party may terminate on 30 days notice.") == "Either party may terminate on 30 days notice"
+    assert (
+        text_of("Either party may terminate on 30 days notice.")
+        == "Either party may terminate on 30 days notice"
+    )
 
 
 def test_surrounding_quote_marks_are_ignored():

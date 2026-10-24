@@ -5,6 +5,7 @@ fixed   LangChain RecursiveCharacterTextSplitter, 1000 characters, 150 overlap (
 clause  follows the contract's own structure: a new chunk starts at a numbered section / ARTICLE / ALL-CAPS
         heading, small sections are kept whole, long paragraphs are split with the same LangChain splitter. Each chunk carries its section heading.
 """
+
 import re
 from dataclasses import dataclass
 
@@ -25,7 +26,9 @@ def _split(text: str, start: int, stop: int, size: int, overlap: int) -> list[tu
     add_start_index gives each piece's offset. We verify every piece really is text[s:e], because the eval
     compares chunk ranges with the experts' marked spans and a wrong offset would silently corrupt the scores.
     """
-    splitter = RecursiveCharacterTextSplitter(chunk_size=size, chunk_overlap=overlap, add_start_index=True)
+    splitter = RecursiveCharacterTextSplitter(
+        chunk_size=size, chunk_overlap=overlap, add_start_index=True
+    )
     out = []
     for doc in splitter.create_documents([text[start:stop]]):
         s = start + doc.metadata["start_index"]
@@ -54,7 +57,9 @@ def _is_section_start(par: str) -> bool:
     if SECTION_START.match(first):
         return True
     letters = [c for c in first if c.isalpha()]
-    return 3 <= len(letters) and len(first) <= 80 and first.upper() == first  # ALL-CAPS heading line
+    return (
+        3 <= len(letters) and len(first) <= 80 and first.upper() == first
+    )  # ALL-CAPS heading line
 
 
 def _with_heading(heading: str | None, body: str) -> str:
@@ -74,7 +79,14 @@ def clause_chunks(text: str, max_chars: int = 1800, min_chars: int = 300) -> lis
     def flush() -> None:
         nonlocal cur_start, cur_end
         if cur_start is not None and text[cur_start:cur_end].strip():
-            chunks.append(Chunk(cur_start, cur_end, cur_heading, _with_heading(cur_heading, text[cur_start:cur_end])))
+            chunks.append(
+                Chunk(
+                    cur_start,
+                    cur_end,
+                    cur_heading,
+                    _with_heading(cur_heading, text[cur_start:cur_end]),
+                )
+            )
         cur_start = cur_end = None
 
     for s, e in paragraphs:
@@ -89,7 +101,9 @@ def clause_chunks(text: str, max_chars: int = 1800, min_chars: int = 300) -> lis
                 chunks.append(Chunk(ws, we, heading, _with_heading(heading, text[ws:we])))
             continue
         too_big = cur_start is not None and (e - cur_start) > max_chars
-        new_section = starts_section and cur_start is not None and (cur_end - cur_start) >= min_chars
+        new_section = (
+            starts_section and cur_start is not None and (cur_end - cur_start) >= min_chars
+        )
         if too_big or new_section:
             flush()
         if cur_start is None:

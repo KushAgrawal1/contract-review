@@ -1,14 +1,15 @@
 """Read the failures of an extraction run yourself. Numbers hide whether the system or the labels are wrong.
 
-  python -m evals.analyze_extraction p3_100                 # 4 examples of each failure type
-  python -m evals.analyze_extraction p3_100 --show 8
-  python -m evals.analyze_extraction p3_100 --category Insurance
+python -m evals.analyze_extraction p3_100                 # 4 examples of each failure type
+python -m evals.analyze_extraction p3_100 --show 8
+python -m evals.analyze_extraction p3_100 --category Insurance
 
-  ungrounded      quote is not in the contract word for word (paraphrase, trimmed, or made up)
-  false_positive  the LLM says present, the experts marked nothing (maybe a real clause the experts skipped)
-  missed          the experts marked it, the LLM said absent
-  wrong_span      detected, but the quote does not overlap the expert span
+ungrounded      quote is not in the contract word for word (paraphrase, trimmed, or made up)
+false_positive  the LLM says present, the experts marked nothing (maybe a real clause the experts skipped)
+missed          the experts marked it, the LLM said absent
+wrong_span      detected, but the quote does not overlap the expert span
 """
+
 import argparse
 import json
 import random
@@ -32,8 +33,10 @@ def diagnose(quote: str, text: str) -> str:
         return "no part of the quote is in the contract (likely invented or from the wrong place)"
     i = squashed.find(q[:lo])
     end = i + lo
-    return (f"first {lo} of {len(q)} characters match; then quote says {q[lo:lo + 40]!r} "
-            f"but contract says {squashed[end:end + 40]!r}")
+    return (
+        f"first {lo} of {len(q)} characters match; then quote says {q[lo : lo + 40]!r} "
+        f"but contract says {squashed[end : end + 40]!r}"
+    )
 
 
 def one_line(text, n):
@@ -63,7 +66,11 @@ def main() -> None:
         "ungrounded": [r for r in rows if r["present"] and not r.get("grounded")],
         "false_positive": [r for r in rows if r["present"] and not r["gold_present"]],
         "missed": [r for r in rows if not r["present"] and r["gold_present"]],
-        "wrong_span": [r for r in rows if r["gold_present"] and r["present"] and r.get("grounded") and not r.get("span_match")],
+        "wrong_span": [
+            r
+            for r in rows
+            if r["gold_present"] and r["present"] and r.get("grounded") and not r.get("span_match")
+        ],
     }
     print(f"{len(rows)} checks in '{args.name}'")
     for key, pool in groups.items():
@@ -71,14 +78,21 @@ def main() -> None:
     for key, pool in groups.items():
         if not pool:
             continue
-        print(f"\n=== {key}: most common clause types: " + ", ".join(f"{c} ({n})" for c, n in Counter(r['category'] for r in pool).most_common(4)))
+        print(
+            f"\n=== {key}: most common clause types: "
+            + ", ".join(
+                f"{c} ({n})" for c, n in Counter(r["category"] for r in pool).most_common(4)
+            )
+        )
         for r in random.Random(0).sample(pool, min(args.show, len(pool))):
             print(f"\n  [{r['category']}] {r['doc_name'][:50]}")
             print(f"    LLM quote : {one_line(r.get('quote'), 260) or '(none)'}")
             g = gold.get((r["doc_name"], r["category"]), [])
             if key == "ungrounded" and r.get("quote"):
                 with get_conn() as conn:
-                    row = conn.execute("SELECT text FROM contracts WHERE doc_name = %s", (r["doc_name"],)).fetchone()
+                    row = conn.execute(
+                        "SELECT text FROM contracts WHERE doc_name = %s", (r["doc_name"],)
+                    ).fetchone()
                 if row:
                     print(f"    why       : {diagnose(r['quote'], row[0])}")
             if g and key != "ungrounded":

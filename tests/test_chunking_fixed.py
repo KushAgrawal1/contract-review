@@ -6,7 +6,7 @@ TEXT = "word " * 600
 def test_every_chunk_is_exactly_the_text_it_points_to():
     chunks = fixed_chunks(TEXT)
     assert chunks
-    assert all(TEXT[c.start:c.end] == c.content for c in chunks)
+    assert all(TEXT[c.start : c.end] == c.content for c in chunks)
 
 
 def test_chunks_respect_the_size_limit():

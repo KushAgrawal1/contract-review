@@ -20,6 +20,7 @@ and ask whether the top-k chunks cover the marked text.
 A chunk "covers" a span when it contains at least half of the span, or at least 100 characters of it (very long
 clauses cannot fit in one chunk). "Document Name" is skipped: it is the title, not a clause.
 """
+
 import argparse
 import json
 import random
@@ -27,7 +28,7 @@ import statistics
 import sys
 import time
 from collections import defaultdict
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -57,12 +58,24 @@ def query_text(category: str, info: dict, example: str | None = None) -> str:
 
 
 def score_pair(docs, spans: list[dict]) -> dict:
-    covered = [any(covers(d.metadata["char_start"], d.metadata["char_end"], sp) for d in docs) for sp in spans]
+    covered = [
+        any(covers(d.metadata["char_start"], d.metadata["char_end"], sp) for d in docs)
+        for sp in spans
+    ]
     rank = next(
-        (r for r, d in enumerate(docs, 1) if any(covers(d.metadata["char_start"], d.metadata["char_end"], sp) for sp in spans)),
+        (
+            r
+            for r, d in enumerate(docs, 1)
+            if any(covers(d.metadata["char_start"], d.metadata["char_end"], sp) for sp in spans)
+        ),
         None,
     )
-    return {"hit": rank is not None, "rank": rank, "spans": len(spans), "spans_covered": sum(covered)}
+    return {
+        "hit": rank is not None,
+        "rank": rank,
+        "spans": len(spans),
+        "spans_covered": sum(covered),
+    }
 
 
 def summarise(rows: list[dict]) -> dict:
@@ -72,13 +85,20 @@ def summarise(rows: list[dict]) -> dict:
         by_cat[r["category"]].append(r)
     total_spans = sum(r["spans"] for r in rows)
     pct = lambda a, b: round(100 * a / b, 1) if b else None
-    cats = {c: {"n": len(v), "clause_hit_pct": pct(sum(x["hit"] for x in v), len(v))} for c, v in sorted(by_cat.items())}
+    cats = {
+        c: {"n": len(v), "clause_hit_pct": pct(sum(x["hit"] for x in v), len(v))}
+        for c, v in sorted(by_cat.items())
+    }
     return {
         "pairs_scored": n,
         "clause_hit_pct": pct(sum(r["hit"] for r in rows), n),
         "span_recall_pct": pct(sum(r["spans_covered"] for r in rows), total_spans),
         "mrr": round(sum(1 / r["rank"] for r in rows if r["rank"]) / n, 3) if n else None,
-        "macro_clause_hit_pct": round(statistics.mean(c["clause_hit_pct"] for c in cats.values()), 1) if cats else None,
+        "macro_clause_hit_pct": round(
+            statistics.mean(c["clause_hit_pct"] for c in cats.values()), 1
+        )
+        if cats
+        else None,
         "by_category": cats,
     }
 
@@ -89,11 +109,19 @@ def main() -> None:
     parser.add_argument("--chunker", default="clause")
     parser.add_argument("--k", type=int, default=settings.top_k)
     parser.add_argument("--limit", type=int, default=None, help="only the first N contracts")
-    parser.add_argument("--random", action="store_true", help="chance baseline: k random chunks per query")
-    parser.add_argument("--expand", action="store_true", help="search with LLM-written example clause wording")
-    parser.add_argument("--hybrid", action="store_true", help="dense + keyword search merged with RRF")
+    parser.add_argument(
+        "--random", action="store_true", help="chance baseline: k random chunks per query"
+    )
+    parser.add_argument(
+        "--expand", action="store_true", help="search with LLM-written example clause wording"
+    )
+    parser.add_argument(
+        "--hybrid", action="store_true", help="dense + keyword search merged with RRF"
+    )
     parser.add_argument("--rerank", choices=["none", "bge"], default="none")
-    parser.add_argument("--candidates", type=int, default=20, help="candidate pool before rerank / cut to k")
+    parser.add_argument(
+        "--candidates", type=int, default=20, help="candidate pool before rerank / cut to k"
+    )
     args = parser.parse_args()
 
     if not LABELS_PATH.exists():
@@ -104,7 +132,9 @@ def main() -> None:
         if not EXAMPLES_PATH.exists():
             sys.exit("Run first: python -m scripts.make_clause_queries")
         examples = json.loads(EXAMPLES_PATH.read_text(encoding="utf-8"))
-    labels = [json.loads(l) for l in LABELS_PATH.read_text(encoding="utf-8").splitlines() if l.strip()]
+    labels = [
+        json.loads(l) for l in LABELS_PATH.read_text(encoding="utf-8").splitlines() if l.strip()
+    ]
 
     started, rows = time.time(), []
     rng = random.Random(0)
@@ -115,7 +145,9 @@ def main() -> None:
             ids = {k: v for k, v in ids.items() if k in keep}
         if not ids:
             sys.exit("No contracts in the database. Run: python -m app.ingest")
-        n_chunks = conn.execute("SELECT count(*) FROM chunks WHERE chunker = %s", (args.chunker,)).fetchone()[0]
+        n_chunks = conn.execute(
+            "SELECT count(*) FROM chunks WHERE chunker = %s", (args.chunker,)
+        ).fetchone()[0]
 
         qvec, qtext, qtsq = {}, {}, {}
         if not args.random:
@@ -127,31 +159,67 @@ def main() -> None:
         todo = [l for l in labels if l["category"] not in SKIP and l["doc_name"] in ids]
         for i, lab in enumerate(todo, start=1):
             if i % 200 == 0 or i == len(todo):
-                print(f"\r{i}/{len(todo)} lookups, {time.time() - started:.0f}s elapsed", end="", flush=True)
+                print(
+                    f"\r{i}/{len(todo)} lookups, {time.time() - started:.0f}s elapsed",
+                    end="",
+                    flush=True,
+                )
             cid = ids[lab["doc_name"]]
             if args.random:
                 spans = conn.execute(
-                    "SELECT char_start, char_end FROM chunks WHERE contract_id = %s AND chunker = %s", (cid, args.chunker)
+                    "SELECT char_start, char_end FROM chunks WHERE contract_id = %s AND chunker = %s",
+                    (cid, args.chunker),
                 ).fetchall()
                 picked = rng.sample(spans, min(args.k, len(spans)))
-                docs = [SimpleNamespace(metadata={"char_start": a, "char_end": b}) for a, b in picked]
+                docs = [
+                    SimpleNamespace(metadata={"char_start": a, "char_end": b}) for a, b in picked
+                ]
             else:
                 cat = lab["category"]
-                docs = retrieve(conn, cid, args.chunker, qvec[cat], args.k, tsq=qtsq[cat], hybrid=args.hybrid,
-                                rerank=args.rerank, query=qtext[cat], candidates=args.candidates)
-            rows.append({"doc_name": lab["doc_name"], "category": lab["category"], **score_pair(docs, lab["spans"])})
+                docs = retrieve(
+                    conn,
+                    cid,
+                    args.chunker,
+                    qvec[cat],
+                    args.k,
+                    tsq=qtsq[cat],
+                    hybrid=args.hybrid,
+                    rerank=args.rerank,
+                    query=qtext[cat],
+                    candidates=args.candidates,
+                )
+            rows.append(
+                {
+                    "doc_name": lab["doc_name"],
+                    "category": lab["category"],
+                    **score_pair(docs, lab["spans"]),
+                }
+            )
 
     print()
     summary = summarise(rows)
     summary["config"] = {
-        "run_name": args.name, "chunker": args.chunker, "k": args.k, "random_baseline": args.random,
-        "expand": args.expand, "hybrid": args.hybrid, "rerank": args.rerank, "candidates": args.candidates,
-        "embedding_model": settings.embedding_model, "contracts": len(ids), "chunks_in_db_for_chunker": n_chunks,
-        "seconds": round(time.time() - started, 1), "timestamp_utc": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+        "run_name": args.name,
+        "chunker": args.chunker,
+        "k": args.k,
+        "random_baseline": args.random,
+        "expand": args.expand,
+        "hybrid": args.hybrid,
+        "rerank": args.rerank,
+        "candidates": args.candidates,
+        "embedding_model": settings.embedding_model,
+        "contracts": len(ids),
+        "chunks_in_db_for_chunker": n_chunks,
+        "seconds": round(time.time() - started, 1),
+        "timestamp_utc": datetime.now(UTC).isoformat(timespec="seconds"),
     }
     RESULTS_DIR.mkdir(parents=True, exist_ok=True)
-    (RESULTS_DIR / f"{args.name}.jsonl").write_text("\n".join(json.dumps(r) for r in rows) + "\n", encoding="utf-8")
-    (RESULTS_DIR / f"{args.name}.summary.json").write_text(json.dumps(summary, indent=2), encoding="utf-8")
+    (RESULTS_DIR / f"{args.name}.jsonl").write_text(
+        "\n".join(json.dumps(r) for r in rows) + "\n", encoding="utf-8"
+    )
+    (RESULTS_DIR / f"{args.name}.summary.json").write_text(
+        json.dumps(summary, indent=2), encoding="utf-8"
+    )
     head = {k: v for k, v in summary.items() if k != "by_category"}
     print(json.dumps(head, indent=2))
     worst = sorted(summary["by_category"].items(), key=lambda kv: kv[1]["clause_hit_pct"])[:8]

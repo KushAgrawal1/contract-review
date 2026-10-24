@@ -3,6 +3,7 @@ README, so the numbers in the README are copied from the runs and never typed by
 
   python -m evals.results_table
 """
+
 import json
 
 from evals.run_eval import RESULTS_DIR
@@ -26,7 +27,9 @@ def main() -> None:
             print(f"| {name} | {label} | missing | | | |")
             continue
         s = json.loads(path.read_text(encoding="utf-8"))
-        print(f"| {name} | {label} | {s['clause_hit_pct']} | {s['span_recall_pct']} | {s['mrr']} | {s['macro_clause_hit_pct']} |")
+        print(
+            f"| {name} | {label} | {s['clause_hit_pct']} | {s['span_recall_pct']} | {s['mrr']} | {s['macro_clause_hit_pct']} |"
+        )
 
 
 if __name__ == "__main__":

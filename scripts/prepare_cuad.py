@@ -9,10 +9,10 @@ Writes
 
 CUAD is CC BY 4.0 (Hendrycks et al., NeurIPS 2021). Character offsets are exact: text[start:end] == span text.
 """
+
 import argparse
 import csv
 import json
-import shutil
 import subprocess
 import zipfile
 from pathlib import Path
@@ -64,11 +64,17 @@ def main() -> None:
     spelling = {l["category"].lower(): l["category"] for l in labels}
     categories = {spelling.get(k.lower(), k): v for k, v in categories.items()}
 
-    (out / "contracts.jsonl").write_text("\n".join(json.dumps(c) for c in contracts) + "\n", encoding="utf-8")
-    (out / "labels.jsonl").write_text("\n".join(json.dumps(l) for l in labels) + "\n", encoding="utf-8")
+    (out / "contracts.jsonl").write_text(
+        "\n".join(json.dumps(c) for c in contracts) + "\n", encoding="utf-8"
+    )
+    (out / "labels.jsonl").write_text(
+        "\n".join(json.dumps(l) for l in labels) + "\n", encoding="utf-8"
+    )
     (out / "categories.json").write_text(json.dumps(categories, indent=2), encoding="utf-8")
-    print(f"{len(contracts)} contracts, {len(labels)} (contract, clause) labels, {n_spans} spans, "
-          f"{len(categories)} categories -> {out}")
+    print(
+        f"{len(contracts)} contracts, {len(labels)} (contract, clause) labels, {n_spans} spans, "
+        f"{len(categories)} categories -> {out}"
+    )
 
 
 if __name__ == "__main__":

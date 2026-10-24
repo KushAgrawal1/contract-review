@@ -25,7 +25,10 @@ def test_clause_names_used_in_extraction_rules_exist():
 
 
 def test_query_text_without_example():
-    assert query_text("Governing Law", {"question": "Which law?", "example": None}) == "Governing Law: Which law?"
+    assert (
+        query_text("Governing Law", {"question": "Which law?", "example": None})
+        == "Governing Law: Which law?"
+    )
 
 
 def test_query_text_with_example():

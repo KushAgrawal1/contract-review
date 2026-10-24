@@ -1,4 +1,5 @@
 """find_quote_fuzzy accepts quotes that are almost, but not exactly, in the contract."""
+
 from app.extract import FUZZY_MIN, find_quote_fuzzy
 
 SENTENCE = (

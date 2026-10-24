@@ -3,8 +3,10 @@ import pytest
 from app.chunking import _is_section_start, clause_chunks
 
 CONTRACT = (
-    "ARTICLE 1 DEFINITIONS\n\n" + "Alpha beta gamma. " * 30
-    + "\n\n2. Term\n\n" + "The term is five years. " * 20
+    "ARTICLE 1 DEFINITIONS\n\n"
+    + "Alpha beta gamma. " * 30
+    + "\n\n2. Term\n\n"
+    + "The term is five years. " * 20
     + "\n\n3. Fees\n\nFees are due monthly."
 )
 

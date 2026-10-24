@@ -4,6 +4,7 @@ quote so a page can highlight it. Same retrieval and extraction as the evaluatio
 Results are cached in Postgres per (contract, prompt version), so a contract costs about one cent the first time and
 nothing after that. That also bounds the cost of a public demo: only ingested contracts can be reviewed.
 """
+
 import json
 import threading
 import time
@@ -47,7 +48,8 @@ def get_cached(doc_name: str) -> dict | None:
     with get_conn() as conn:
         conn.execute(CACHE_SQL)
         row = conn.execute(
-            "SELECT result FROM reviews WHERE doc_name = %s AND prompt_version = %s", (doc_name, PROMPT_VERSION)
+            "SELECT result FROM reviews WHERE doc_name = %s AND prompt_version = %s",
+            (doc_name, PROMPT_VERSION),
         ).fetchone()
     return row[0] if row else None
 
@@ -60,7 +62,9 @@ def review_contract(doc_name: str, workers: int = 8, use_cache: bool = True) -> 
     clauses = load_clauses()
     qv = _query_vectors()
     with get_conn() as conn:
-        row = conn.execute("SELECT id, text FROM contracts WHERE doc_name = %s", (doc_name,)).fetchone()
+        row = conn.execute(
+            "SELECT id, text FROM contracts WHERE doc_name = %s", (doc_name,)
+        ).fetchone()
         if not row:
             raise KeyError(doc_name)
         cid, text = row
@@ -74,7 +78,9 @@ def review_contract(doc_name: str, workers: int = 8, use_cache: bool = True) -> 
         if not hasattr(local, "conn"):
             local.conn = get_conn()
         qtext, vec = qv[cat]
-        docs = retrieve(local.conn, cid, CHUNKER, vec, settings.top_k, tsq=tsq[cat], hybrid=True, query=qtext)
+        docs = retrieve(
+            local.conn, cid, CHUNKER, vec, settings.top_k, tsq=tsq[cat], hybrid=True, query=qtext
+        )
         ranges = passage_ranges(docs, text, cat, head=True)
         res = extract_clause(chain, text, cat, clauses[cat], ranges)
         return {"category": cat, **res}
@@ -88,7 +94,10 @@ def review_contract(doc_name: str, workers: int = 8, use_cache: bool = True) -> 
         "doc_name": doc_name,
         "prompt_version": PROMPT_VERSION,
         "clauses": [
-            {k: r.get(k) for k in ("category", "present", "quote", "start", "end", "grounded", "match")}
+            {
+                k: r.get(k)
+                for k in ("category", "present", "quote", "start", "end", "grounded", "match")
+            }
             for r in results
         ],
         "found": sum(1 for r in results if r["present"]),

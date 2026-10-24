@@ -7,6 +7,7 @@ does a party need consent to assign?". Searching with an example of the real wor
 The LLM only sees the clause name and CUAD's one-line description, never any contract or label.
 Use it in the eval with --expand.
 """
+
 import json
 from pathlib import Path
 
@@ -31,12 +32,18 @@ PROMPT = ChatPromptTemplate.from_messages(
 
 def main() -> None:
     categories = json.loads(Path("data/cuad/categories.json").read_text(encoding="utf-8"))
-    chain = PROMPT | get_chat_model(model_kwargs={"response_format": {"type": "json_object"}}) | JsonOutputParser()
+    chain = (
+        PROMPT
+        | get_chat_model(model_kwargs={"response_format": {"type": "json_object"}})
+        | JsonOutputParser()
+    )
     out = {}
     for name, info in categories.items():
         if name == "Document Name":
             continue
-        out[name] = chain.invoke({"category": name, "question": info["question"]})["example"].strip()
+        out[name] = chain.invoke({"category": name, "question": info["question"]})[
+            "example"
+        ].strip()
         print(f"{name}: {out[name][:100]}")
     Path("data/cuad/clause_examples.json").write_text(json.dumps(out, indent=2), encoding="utf-8")
     print(f"wrote {len(out)} examples to data/cuad/clause_examples.json")

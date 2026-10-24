@@ -1,4 +1,5 @@
 """Question answering over one contract as a LangGraph: retrieve -> generate (Phase 2+ adds nodes)."""
+
 from typing import TypedDict
 
 from langchain_core.documents import Document
@@ -26,8 +27,10 @@ class QAState(TypedDict, total=False):
 
 
 def format_docs(docs: list[Document]) -> str:
-    return "\n\n".join(f"[{i}] (characters {d.metadata['char_start']}-{d.metadata['char_end']})\n{d.page_content}"
-                       for i, d in enumerate(docs, 1))
+    return "\n\n".join(
+        f"[{i}] (characters {d.metadata['char_start']}-{d.metadata['char_end']})\n{d.page_content}"
+        for i, d in enumerate(docs, 1)
+    )
 
 
 def build_graph(doc_name: str, k: int = 5, chunker: str = "clause", retriever=None, llm=None):
@@ -41,7 +44,9 @@ def build_graph(doc_name: str, k: int = 5, chunker: str = "clause", retriever=No
         docs = state.get("documents", [])
         if not docs:
             return {"answer": "No contract found with that name."}
-        return {"answer": chain.invoke({"context": format_docs(docs), "question": state["question"]})}
+        return {
+            "answer": chain.invoke({"context": format_docs(docs), "question": state["question"]})
+        }
 
     g = StateGraph(QAState)
     g.add_node("retrieve", retrieve)

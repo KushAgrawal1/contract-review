@@ -9,7 +9,10 @@ def test_present_clause_keeps_its_quote():
 
 
 def test_absent_clause_drops_any_quote():
-    assert parse_answer('{"present": false, "quote": "stray text"}') == {"present": False, "quote": None}
+    assert parse_answer('{"present": false, "quote": "stray text"}') == {
+        "present": False,
+        "quote": None,
+    }
 
 
 def test_invalid_json_is_flagged_not_raised():

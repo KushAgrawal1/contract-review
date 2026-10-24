@@ -6,6 +6,7 @@
 Re-running skips contracts that already have chunks for that chunker. Embeddings are computed before the
 transaction, so a failure never leaves a half-loaded contract.
 """
+
 import argparse
 import json
 import time
@@ -21,7 +22,9 @@ CONTRACTS_PATH = Path("data/cuad/contracts.jsonl")
 
 
 def load_contracts(limit: int | None = None) -> list[dict]:
-    rows = [json.loads(l) for l in CONTRACTS_PATH.read_text(encoding="utf-8").splitlines() if l.strip()]
+    rows = [
+        json.loads(l) for l in CONTRACTS_PATH.read_text(encoding="utf-8").splitlines() if l.strip()
+    ]
     return rows[:limit] if limit else rows
 
 
@@ -40,21 +43,37 @@ def main() -> None:
         for n, c in enumerate(contracts, start=1):
             label = f"[{n}/{len(contracts)}] {c['doc_name'][:60]}"
             try:
-                row = conn.execute("SELECT id FROM contracts WHERE doc_name = %s", (c["doc_name"],)).fetchone()
-                contract_id = row[0] if row else conn.execute(
-                    "INSERT INTO contracts (doc_name, n_chars, text) VALUES (%s, %s, %s) RETURNING id",
-                    (c["doc_name"], len(c["text"]), c["text"]),
-                ).fetchone()[0]
+                row = conn.execute(
+                    "SELECT id FROM contracts WHERE doc_name = %s", (c["doc_name"],)
+                ).fetchone()
+                contract_id = (
+                    row[0]
+                    if row
+                    else conn.execute(
+                        "INSERT INTO contracts (doc_name, n_chars, text) VALUES (%s, %s, %s) RETURNING id",
+                        (c["doc_name"], len(c["text"]), c["text"]),
+                    ).fetchone()[0]
+                )
                 for name in chunkers:
                     if conn.execute(
-                        "SELECT 1 FROM chunks WHERE contract_id = %s AND chunker = %s LIMIT 1", (contract_id, name)
+                        "SELECT 1 FROM chunks WHERE contract_id = %s AND chunker = %s LIMIT 1",
+                        (contract_id, name),
                     ).fetchone():
                         skipped += 1
                         continue
                     chunks = CHUNKERS[name](c["text"])
                     vectors = get_embeddings().embed_documents([ch.content for ch in chunks])
                     rows = [
-                        (contract_id, name, i, ch.start, ch.end, ch.heading, ch.content, np.array(v, dtype=np.float32))
+                        (
+                            contract_id,
+                            name,
+                            i,
+                            ch.start,
+                            ch.end,
+                            ch.heading,
+                            ch.content,
+                            np.array(v, dtype=np.float32),
+                        )
                         for i, (ch, v) in enumerate(zip(chunks, vectors))
                     ]
                     with conn.transaction(), conn.cursor() as cur:
@@ -71,7 +90,9 @@ def main() -> None:
                 if conn.closed or conn.broken:
                     print("database connection lost - re-run the same command to resume.")
                     break
-    print(f"done in {time.time() - started:.0f}s: {added} chunks added, {skipped} skipped, {failed} failed")
+    print(
+        f"done in {time.time() - started:.0f}s: {added} chunks added, {skipped} skipped, {failed} failed"
+    )
 
 
 if __name__ == "__main__":

@@ -3,6 +3,7 @@
 Read from app/clauses.json (committed, so the deployed app does not need the CUAD download). Create it once with
 `python -m scripts.export_clauses`. Falls back to data/cuad/ if that file is missing.
 """
+
 import json
 from functools import lru_cache
 from pathlib import Path

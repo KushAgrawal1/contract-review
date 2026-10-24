@@ -8,6 +8,7 @@ strategy, so strategies can be compared). Phase 2 techniques are switches; the d
 
 Keyword search is Postgres full-text ranking (ts_rank_cd) over the question's rarer words, not true BM25.
 """
+
 from functools import lru_cache
 
 import numpy as np
@@ -47,8 +48,15 @@ def _to_documents(rows, contract_id: int) -> list[Document]:
     return [
         Document(
             page_content=content,
-            metadata={"chunk_id": cid, "chunk_index": idx, "char_start": s, "char_end": e,
-                      "heading": heading, "score": float(score), "contract_id": contract_id},
+            metadata={
+                "chunk_id": cid,
+                "chunk_index": idx,
+                "char_start": s,
+                "char_end": e,
+                "heading": heading,
+                "score": float(score),
+                "contract_id": contract_id,
+            },
         )
         for cid, idx, s, e, heading, content, score in rows
     ]
@@ -79,7 +87,9 @@ def keyword_query(conn, chunker: str, text: str) -> str | None:
     """OR-query over the text's rarest stemmed terms, for to_tsquery('simple', ...). Terms are quoted, so safe."""
     df, n = _doc_freq(chunker)
     stems = [r[0] for r in conn.execute(STEM_SQL, (text,)).fetchall()]
-    kept = sorted({s for s in stems if df.get(s, 0) and df[s] <= MAX_COMMON * n}, key=lambda s: df[s])[:MAX_TERMS]
+    kept = sorted(
+        {s for s in stems if df.get(s, 0) and df[s] <= MAX_COMMON * n}, key=lambda s: df[s]
+    )[:MAX_TERMS]
     return " | ".join("'" + s.replace("'", "''") + "'" for s in kept) or None
 
 
@@ -107,8 +117,19 @@ def rrf_fuse(*rankings: list[Document], k: int = RRF_K) -> list[Document]:
     return fused
 
 
-def retrieve(conn, contract_id: int, chunker: str, query_vec, k: int, *, tsq: str | None = None,
-             hybrid: bool = False, rerank: str = "none", query: str = "", candidates: int = 20) -> list[Document]:
+def retrieve(
+    conn,
+    contract_id: int,
+    chunker: str,
+    query_vec,
+    k: int,
+    *,
+    tsq: str | None = None,
+    hybrid: bool = False,
+    rerank: str = "none",
+    query: str = "",
+    candidates: int = 20,
+) -> list[Document]:
     """Dense (+ keyword) candidates, optional rerank, then the top k."""
     pool = max(candidates, k) if (hybrid or rerank != "none") else k
     docs = search_contract(conn, query_vec, contract_id, chunker, pool)
@@ -134,15 +155,27 @@ class ContractRetriever(BaseRetriever):
     rerank: str = "none"
     candidates: int = 20
 
-    def _get_relevant_documents(self, query: str, *, run_manager: CallbackManagerForRetrieverRun) -> list[Document]:
+    def _get_relevant_documents(
+        self, query: str, *, run_manager: CallbackManagerForRetrieverRun
+    ) -> list[Document]:
         q = np.array(get_embeddings().embed_query(query), dtype=np.float32)
         with get_conn() as conn:
             cid = contract_id_for(conn, self.doc_name)
             if cid is None:
                 return []
             tsq = keyword_query(conn, self.chunker, query) if self.hybrid else None
-            docs = retrieve(conn, cid, self.chunker, q, self.k, tsq=tsq, hybrid=self.hybrid,
-                            rerank=self.rerank, query=query, candidates=self.candidates)
+            docs = retrieve(
+                conn,
+                cid,
+                self.chunker,
+                q,
+                self.k,
+                tsq=tsq,
+                hybrid=self.hybrid,
+                rerank=self.rerank,
+                query=query,
+                candidates=self.candidates,
+            )
         for d in docs:
             d.metadata["doc_name"] = self.doc_name
         return docs

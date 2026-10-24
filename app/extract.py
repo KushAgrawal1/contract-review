@@ -5,6 +5,7 @@ is this clause present, and if so which words of the contract are it? The LLM mu
 every answer can be checked against the contract text. A quote that cannot be found in the contract is a
 hallucination and is flagged (grounded = False).
 """
+
 import difflib
 import json
 import re
@@ -67,7 +68,9 @@ def excerpts_text(contract_text: str, ranges: list[tuple[int, int]]) -> str:
 def passage_ranges(docs, contract_text: str, category: str, head: bool) -> list[tuple[int, int]]:
     ranges = [(d.metadata["char_start"], d.metadata["char_end"]) for d in docs]
     if head and category in HEAD_CATEGORIES:
-        ranges = [(0, min(HEAD_CHARS, len(contract_text)))] + [r for r in ranges if r[0] >= HEAD_CHARS]
+        ranges = [(0, min(HEAD_CHARS, len(contract_text)))] + [
+            r for r in ranges if r[0] >= HEAD_CHARS
+        ]
     return ranges
 
 
@@ -102,7 +105,9 @@ def find_quote(quote: str | None, contract_text: str) -> tuple[int, int] | None:
     if not quote or not quote.strip():
         return None
     squashed, pos = _squashed(contract_text)
-    quote = quote.strip().strip("\"'").rstrip(".,;:")  # the model often adds a full stop where the contract has a comma
+    quote = (
+        quote.strip().strip("\"'").rstrip(".,;:")
+    )  # the model often adds a full stop where the contract has a comma
     segments = [seg for seg in re.split(r"\.\.\.|\u2026", quote) if len("".join(seg.split())) >= 3]
     if not segments:
         return None
@@ -133,13 +138,17 @@ def find_quote_fuzzy(quote: str | None, contract_text: str) -> tuple[int, int, f
     squashed, pos = _squashed(contract_text)
     best = None
     for off in sorted({0, len(q) // 3, 2 * len(q) // 3, len(q) - 20}):
-        anchor = q[off:off + 20]
+        anchor = q[off : off + 20]
         i = squashed.find(anchor)
         if i == -1:
             continue
         lo = max(0, i - off - 20)
-        window = squashed[lo:lo + int(len(q) * 1.5) + 60]
-        blocks = [b for b in difflib.SequenceMatcher(None, q, window, autojunk=False).get_matching_blocks() if b.size >= 4]
+        window = squashed[lo : lo + int(len(q) * 1.5) + 60]
+        blocks = [
+            b
+            for b in difflib.SequenceMatcher(None, q, window, autojunk=False).get_matching_blocks()
+            if b.size >= 4
+        ]
         if not blocks:
             continue
         share = sum(b.size for b in blocks) / len(q)
@@ -155,10 +164,15 @@ def parse_answer(content: str) -> dict:
         data = json.loads(content)
     except (json.JSONDecodeError, TypeError):
         return {"present": False, "quote": None, "parse_error": True}
-    return {"present": bool(data.get("present")), "quote": data.get("quote") if data.get("present") else None}
+    return {
+        "present": bool(data.get("present")),
+        "quote": data.get("quote") if data.get("present") else None,
+    }
 
 
-def extract_clause(chain, contract_text: str, category: str, info: dict, ranges: list[tuple[int, int]]) -> dict:
+def extract_clause(
+    chain, contract_text: str, category: str, info: dict, ranges: list[tuple[int, int]]
+) -> dict:
     msg = chain.invoke(
         {
             "category": category,
@@ -177,7 +191,9 @@ def extract_clause(chain, contract_text: str, category: str, info: dict, ranges:
             span, match = fuzzy[:2], "fuzzy"
     out["start"], out["end"] = span if span else (None, None)
     out["grounded"] = span is not None if out["present"] else None
-    out["match"] = match  # "exact" = found word for word; "fuzzy" = at least 90% found, see find_quote_fuzzy
+    out["match"] = (
+        match  # "exact" = found word for word; "fuzzy" = at least 90% found, see find_quote_fuzzy
+    )
     usage = getattr(msg, "usage_metadata", None) or {}
     out["input_tokens"] = usage.get("input_tokens", 0)
     out["output_tokens"] = usage.get("output_tokens", 0)
